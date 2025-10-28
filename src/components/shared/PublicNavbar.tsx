@@ -1,8 +1,11 @@
+'use client';
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
+import checkAuthStatus from "@/utility/auth";
 
+const { user } = await checkAuthStatus();
 const PublicNavbar = () => {
   const navItems = [
     { href: "#", label: "Consultation" },
@@ -11,6 +14,12 @@ const PublicNavbar = () => {
     { href: "#", label: "Diagnostics" },
     { href: "#", label: "NGOs" },
   ];
+
+  const { role } = user || { role: 'guest' };
+  if (role === "ADMIN") {
+    navItems.push({ href: "/dashboard/admin", label: "Admin Dashboard" })
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur  dark:bg-background/95">
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6">
@@ -31,9 +40,13 @@ const PublicNavbar = () => {
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
-          <Link href="/login" className="text-lg font-medium">
-            <Button>Login</Button>
-          </Link>
+          {role !== 'guest' ? (
+            <Button variant="destructive">Logout</Button>
+          ) : (
+            <Link href="/login" className="text-lg font-medium">
+              <Button>Login</Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -41,7 +54,7 @@ const PublicNavbar = () => {
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline"> <Menu/> </Button>
+              <Button variant="outline"> <Menu /> </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] p-4">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
@@ -57,9 +70,13 @@ const PublicNavbar = () => {
                 ))}
                 <div className="border-t pt-4 flex flex-col space-y-4">
                   <div className="flex justify-center"></div>
-                  <Link href="/login" className="text-lg font-medium">
-                    <Button>Login</Button>
-                  </Link>
+                  {role !== 'guest' ? (
+                    <Button variant="destructive">Logout</Button>
+                  ) : (
+                    <Link href="/login" className="text-lg font-medium">
+                      <Button>Login</Button>
+                    </Link>
+                  )}
                 </div>
               </nav>
             </SheetContent>
