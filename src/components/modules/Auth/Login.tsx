@@ -28,6 +28,7 @@ import {
 import loginUser from "@/utility/login";
 import { useRouter } from "next/navigation";
 import checkAuthStatus from "@/utility/auth";
+import { UseUser } from "@/Providers/UserProvider";
 
 const loginSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -43,6 +44,7 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter()
+    const { setUser } = UseUser();
 
     const form = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
@@ -62,17 +64,18 @@ export default function Login() {
             console.log("response status from component", res)
             if (res.success) {
                 const authStatus = await checkAuthStatus()
+                setUser(authStatus.user);
                 if (authStatus.isAuthenticated && authStatus.user) {
                     const { role } = authStatus.user
                     switch (role) {
                         case "ADMIN":
-                            router.push("/dashboard/admin");
+                            router.push("/admin/dashboard");
                             break;
                         case "DOCTOR":
-                            router.push("/dashboard/doctor");
+                            router.push("/doctor/dashboard");
                             break;
                         case "PATIENT":
-                            router.push("/dashboard/patient");
+                            router.push("/patient/dashboard");
                             break;
 
                         default:

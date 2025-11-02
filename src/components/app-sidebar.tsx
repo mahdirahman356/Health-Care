@@ -1,4 +1,6 @@
 "use client"
+
+import * as React from "react"
 import {
   IconDashboard,
   IconHelp,
@@ -20,39 +22,45 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import checkAuthStatus from "@/utility/auth"
+import Link from "next/link"
 
-const { user } = await checkAuthStatus()
-const { role } = user || { role: 'guest' }
+
+
+
+
+
 
 const navMainItems = [
-  {
-    title: "Dashboard",
-    url: "#",
-    icon: IconDashboard,
-  },
-]
-
-if (role === "ADMIN") {
-  navMainItems.push(
     {
-      title: "Manage Doctors",
-      url: "/dashboard/admin/manage-doctors",
-      icon: IconSettings,
+      title: "Dashboard",
+      url: "#",
+      icon: IconDashboard,
     },
-    {
-      title: "Manage Patients",
-      url: "/dashboard/admin/manage-patients",
-      icon: IconUsers,
-    }
-  )
-}
+    // {
+    //   title: "Lifecycle",
+    //   url: "#",
+    //   icon: IconListDetails,
+    // },
+    // {
+    //   title: "Analytics",
+    //   url: "#",
+    //   icon: IconChartBar,
+    // },
+    // {
+    //   title: "Add Doctor",
+    //   url: "/dashboard/add-doctor",
+    //   icon: IconUsers,
+    // },
+  ]
+
+  
+  
 
 const data = {
   user: {
-    name: user?.name,
-    email: user?.email,
-    avatar: user?.profilePhoto
+    name: '',
+    email: '',
+    avatar: '',
   },
   navMain: navMainItems,
   navSecondary: [
@@ -72,10 +80,13 @@ const data = {
       icon: IconSearch,
     },
   ],
-
+ 
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+ 
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -85,10 +96,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#">
-                <IconInnerShadowTop className="size-5!" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
+              <Link href="/">
+                <IconInnerShadowTop className="!size-5" />
+                <span className="text-base font-semibold">PH Health Care</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
