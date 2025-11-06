@@ -3,14 +3,10 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
-import { UseUser } from "@/Providers/UserProvider";
-import { logOutUser } from "@/utility/logOut";
 
 const PublicNavbar = () => {
 
 
-  const { user } = UseUser();
-  const role = user?.role || 'guest';
 
   const navItems = [
     { href: "#", label: "Consultation" },
@@ -20,9 +16,6 @@ const PublicNavbar = () => {
     { href: "#", label: "NGOs" },
   ];
 
-  if (role === 'ADMIN') {
-    navItems.push({ href: "/admin/dashboard", label: "Admin Dashboard" });
-  }
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur  dark:bg-background/95">
@@ -44,14 +37,9 @@ const PublicNavbar = () => {
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
-          {role !== 'guest' ? (
-            <Button variant="destructive" onClick={() =>
-              logOutUser()}>Logout</Button>
-          ) : (
             <Link href="/login" className="text-lg font-medium">
               <Button>Login</Button>
             </Link>
-          )}
         </div>
 
         {/* Mobile Menu */}
@@ -75,14 +63,9 @@ const PublicNavbar = () => {
                 ))}
                 <div className="border-t pt-4 flex flex-col space-y-4">
                   <div className="flex justify-center"></div>
-                  {role !== 'guest' ? (
-                    <Button variant="destructive" onClick={() =>
-                      logOutUser()}>Logout</Button>
-                  ) : (
                     <Link href="/login" className="text-lg font-medium">
                       <Button>Login</Button>
                     </Link>
-                  )}
                 </div>
               </nav>
             </SheetContent>
