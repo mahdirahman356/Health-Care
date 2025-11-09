@@ -1,12 +1,13 @@
 "use server"
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import z, { any } from "zod";
+import z, { any, success } from "zod";
 import { parse } from "cookie"
 import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { redirect } from "next/navigation";
 import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth-utils";
+import { setCookie } from "./tokenHandlers";
 
 const loginValidationZodSchema = z.object({
     email: z.email({
@@ -52,7 +53,7 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
                 "Content-Type": "application/json",
             },
         })
-
+        const result = await res.json()
         const setCookieHeaders = res.headers.getSetCookie()
 
         if (setCookieHeaders && setCookieHeaders.length > 0) {
@@ -78,16 +79,14 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             throw new Error("Token not found in cookie")
         }
 
-        const cookieStore = await cookies()
-
-        cookieStore.set("accessToken", accessTokenObject.accessToken, {
+        await setCookie("accessToken", accessTokenObject.accessToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(accessTokenObject.maxAge),
             path: accessTokenObject.path || "/"
         })
 
-        cookieStore.set("refreshToken", refreshTokenOBject.refreshToken, {
+        await setCookie("refreshToken", refreshTokenOBject.refreshToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(refreshTokenOBject.maxAge),
@@ -101,21 +100,32 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             throw new Error("Invalid token")
         }
         const userRole: UserRole = verifiedToken.role
-         
-        if(redirectTo){
+
+        if (!result?.success) {
+            throw new Error("Login failed")
+        }
+
+        if (redirectTo) {
             const requestedPath = redirect.toString()
-            if(isValidRedirectForRole(requestedPath, userRole)){
-                redirect(requestedPath)
-            }else{
-                redirect(getDefaultDashboardRoute(userRole))
+            if (isValidRedirectForRole(requestedPath, userRole)) {
+                redirect(`${requestedPath}?loggedIn=true`);
+            } else {
+                redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
             }
+        } else {
+            redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
         }
 
     } catch (error: any) {
         console.log(error)
-        if(error?.digest?.startsWith('NEXT_REDIRECT')){
+        if (error?.digest?.startsWith('NEXT_REDIRECT')) {
             throw error
         }
-        return { error: "Login failed" };
+        return {
+            success: false, message:
+                `${process.env.NODE_ENV === 'development'
+                    ? error.message
+                    : "Login Failed. You might have entered incorrect email or password."}`
+        };
     }
 }
