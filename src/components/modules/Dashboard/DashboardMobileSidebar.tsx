@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { SheetTitle } from "@/components/ui/sheet";
+import { getIconComponent } from "@/lib/icon-mapper";
 import { cn } from "@/lib/utils";
 import { NavSection } from "@/types/dashboard.interface";
 import { UserInfo } from "@/types/user.interface";
@@ -46,7 +47,7 @@ const DashboardMobileSidebar = ({
               <div className="space-y-1">
                 {section.items.map((item) => {
                   const isActive = pathname === item.href;
-                  const Icon = <Bell />
+                  const Icon = getIconComponent(item.icon)
 
                   return (
                     <Link
@@ -59,7 +60,7 @@ const DashboardMobileSidebar = ({
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       )}
                     >
-                      <Bell className="h-4 w-4" />
+                      <Icon className="h-4 w-4" />
                       <span className="flex-1">{item.title}</span>
                       {item.badge && (
                         <Badge variant={isActive ? "secondary" : "default"}>

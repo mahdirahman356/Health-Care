@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getIconComponent } from "@/lib/icon-mapper";
 
 interface DashboardSidebarContentProps {
     userInfo: UserInfo;
@@ -43,7 +44,7 @@ const DashboardSidebarContent = ({
                             <div className="space-y-1">
                                 {section.items.map((item) => {
                                     const isActive = pathname === item.href;
-                                    const Icon = <Bell />
+                                    const Icon = getIconComponent(item.icon)
 
                                     return (
                                         <Link
@@ -56,7 +57,7 @@ const DashboardSidebarContent = ({
                                                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                             )}
                                         >
-                                            <Bell className="h-4 w-4" />
+                                            <Icon className="h-4 w-4" />
                                             <span className="flex-1">{item.title}</span>
                                             {item.badge && (
                                                 <Badge
