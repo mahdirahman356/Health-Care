@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getIconComponent } from "@/lib/icon-mapper";
 

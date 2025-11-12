@@ -8,7 +8,6 @@ import { getIconComponent } from "@/lib/icon-mapper";
 import { cn } from "@/lib/utils";
 import { NavSection } from "@/types/dashboard.interface";
 import { UserInfo } from "@/types/user.interface";
-import { Bell } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
