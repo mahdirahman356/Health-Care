@@ -32,8 +32,11 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
 
         const validatedPayload = zodValidator(payload, loginValidationZodSchema).data;
 
-        const res = await serverFetch.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        const res = await serverFetch.post(`/auth/login`, {
             body: JSON.stringify(validatedPayload),
+            headers: {
+                 "Content-Type": "application/json"
+            }
         })
         const result = await res.json()
         const setCookieHeaders = res.headers.getSetCookie()

@@ -44,7 +44,7 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
             newFormData.append("file", formData.get("file") as Blob)
         }
 
-        const res = await serverFetch.post(`${process.env.NEXT_PUBLIC_API_URL}/user/create-patient`, {
+        const res = await serverFetch.post(`/user/create-patient`, {
             body: newFormData,
         })
 
