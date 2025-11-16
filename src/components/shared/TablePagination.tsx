@@ -1,5 +1,6 @@
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
+"use client"
+
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -22,6 +23,10 @@ const TablePagination = ({ currentPage, totalPages }: TablePaginationProps) => {
         startTransition(() => {
             router.push(`?${params.toString()}`);
         });
+    }
+
+    if (totalPages <= 1) {
+        return null;
     }
 
     return (

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { loginUser } from "@/services/auth/loginUser";
 import { useActionState, useEffect } from "react";
