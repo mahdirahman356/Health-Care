@@ -1,29 +1,25 @@
-"use server"
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import z, { any, success } from "zod";
-import { parse } from "cookie"
-import { cookies } from "next/headers";
-import jwt, { JwtPayload } from "jsonwebtoken"
-import { redirect } from "next/navigation";
+"use server"
+
 import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth-utils";
-import { setCookie } from "./tokenHandlers";
-import { loginValidationZodSchema } from "@/zod/auth.validation";
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidator } from "@/lib/zodValidator";
+import { loginValidationZodSchema } from "@/zod/auth.validation";
+import { parse } from "cookie";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { redirect } from "next/navigation";
+import { setCookie } from "./tokenHandlers";
 
 
 
 export const loginUser = async (_currentState: any, formData: any): Promise<any> => {
     try {
-        const redirectTo = formData.get("redirect")
-        console.log("redirect", redirectTo)
+        const redirectTo = formData.get('redirect') || null;
         let accessTokenObject: null | any = null;
-        let refreshTokenOBject: null | any = null
-
+        let refreshTokenObject: null | any = null;
         const payload = {
-            email: formData.get("email"),
-            password: formData.get("password")
+            email: formData.get('email'),
+            password: formData.get('password'),
         }
 
         if (zodValidator(payload, loginValidationZodSchema).success === false) {
@@ -32,66 +28,86 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
 
         const validatedPayload = zodValidator(payload, loginValidationZodSchema).data;
 
-        const res = await serverFetch.post(`/auth/login`, {
+        const res = await serverFetch.post("/auth/login", {
             body: JSON.stringify(validatedPayload),
             headers: {
-                 "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
-        })
-        const result = await res.json()
-        const setCookieHeaders = res.headers.getSetCookie()
+        });
+
+        const result = await res.json();
+
+        const setCookieHeaders = res.headers.getSetCookie();
 
         if (setCookieHeaders && setCookieHeaders.length > 0) {
-            setCookieHeaders.forEach((cookie) => {
-                const parsedCookie = parse(cookie)
-                console.log("parsedCookie", parsedCookie)
+            setCookieHeaders.forEach((cookie: string) => {
+                const parsedCookie = parse(cookie);
 
-                if (parsedCookie["accessToken"]) {
-                    accessTokenObject = parsedCookie
+                if (parsedCookie['accessToken']) {
+                    accessTokenObject = parsedCookie;
                 }
-                if (parsedCookie["refreshToken"]) {
-                    refreshTokenOBject = parsedCookie
+                if (parsedCookie['refreshToken']) {
+                    refreshTokenObject = parsedCookie;
                 }
             })
         } else {
-            throw Error("No set-cookie header found")
+            throw new Error("No Set-Cookie header found");
         }
 
         if (!accessTokenObject) {
-            throw new Error("Token not found in cookie")
+            throw new Error("Tokens not found in cookies");
         }
-        if (!refreshTokenOBject) {
-            throw new Error("Token not found in cookie")
+
+        if (!refreshTokenObject) {
+            throw new Error("Tokens not found in cookies");
         }
+
 
         await setCookie("accessToken", accessTokenObject.accessToken, {
             secure: true,
             httpOnly: true,
-            maxAge: parseInt(accessTokenObject.maxAge),
-            path: accessTokenObject.path || "/"
-        })
+            maxAge: parseInt(accessTokenObject['Max-Age']) || 1000 * 60 * 60,
+            path: accessTokenObject.Path || "/",
+            sameSite: accessTokenObject['SameSite'] || "none",
+        });
 
-        await setCookie("refreshToken", refreshTokenOBject.refreshToken, {
+        await setCookie("refreshToken", refreshTokenObject.refreshToken, {
             secure: true,
             httpOnly: true,
-            maxAge: parseInt(refreshTokenOBject.maxAge),
-            path: refreshTokenOBject.path || "/"
-        })
-
-
-        const verifiedToken: JwtPayload | string = jwt.verify(accessTokenObject.accessToken, process.env.JWT_ACCESS_SECRET as string)
+            maxAge: parseInt(refreshTokenObject['Max-Age']) || 1000 * 60 * 60 * 24 * 90,
+            path: refreshTokenObject.Path || "/",
+            sameSite: refreshTokenObject['SameSite'] || "none",
+        });
+        const verifiedToken: JwtPayload | string = jwt.verify(accessTokenObject.accessToken, process.env.JWT_ACCESS_SECRET as string);
 
         if (typeof verifiedToken === "string") {
-            throw new Error("Invalid token")
-        }
-        const userRole: UserRole = verifiedToken.role
+            throw new Error("Invalid token");
 
-        if (!result?.success) {
-            throw new Error("Login failed")
         }
+
+        const userRole: UserRole = verifiedToken.role;
+
+        if (!result.success) {
+            throw new Error(result.message || "Login failed");
+        }
+
+        if (redirectTo && result.data.needPasswordChange) {
+            const requestedPath = redirectTo.toString();
+            if (isValidRedirectForRole(requestedPath, userRole)) {
+                redirect(`/reset-password?redirect=${requestedPath}`);
+            } else {
+                redirect("/reset-password");
+            }
+        }
+
+        if (result.data.needPasswordChange) {
+            redirect("/reset-password");
+        }
+
+
 
         if (redirectTo) {
-            const requestedPath = redirect.toString()
+            const requestedPath = redirectTo.toString();
             if (isValidRedirectForRole(requestedPath, userRole)) {
                 redirect(`${requestedPath}?loggedIn=true`);
             } else {
@@ -102,15 +118,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         }
 
     } catch (error: any) {
-        console.log(error)
         if (error?.digest?.startsWith('NEXT_REDIRECT')) {
-            throw error
+            throw error;
         }
-        return {
-            success: false, message:
-                `${process.env.NODE_ENV === 'development'
-                    ? error.message
-                    : "Login Failed. You might have entered incorrect email or password."}`
-        };
+        console.log(error);
+        return { success: false, message: `${process.env.NODE_ENV === 'development' ? error.message : "Login Failed. You might have entered incorrect email or password."}` };
     }
 }

@@ -13,7 +13,7 @@ const LoginPage = async ({searchParams}: {searchParams?: Promise<{redirect?: str
             Enter your credentials to access your account
           </p>
         </div>
-        <LoginForm redirect={params.redirect}/>
+        <LoginForm redirect={params?.redirect}/>
       </div>
     </div>
   );
