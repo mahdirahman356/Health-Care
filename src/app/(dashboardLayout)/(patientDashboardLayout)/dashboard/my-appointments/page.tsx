@@ -1,8 +1,8 @@
-import DoctorAppointmentsTable from "@/components/modules/Doctor/DoctorAppointments/DoctorAppointmentTable";
+import AppointmentsList from "@/components/modules/Patient/PatientAppointment/AppointmentsList";
 import { getMyAppointments } from "@/services/patient/appointment.service";
 import { IAppointment } from "@/types/appointments.interface";
 
-export default async function DoctorAppointmentsPage() {
+export default async function MyAppointmentsPage() {
   const response = await getMyAppointments();
   const appointments: IAppointment[] = response?.data || [];
 
@@ -11,11 +11,11 @@ export default async function DoctorAppointmentsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">My Appointments</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your patient appointments and prescriptions
+          View and manage your scheduled appointments
         </p>
       </div>
 
-      <DoctorAppointmentsTable appointments={appointments} />
+      <AppointmentsList appointments={appointments} />
     </div>
   );
 }

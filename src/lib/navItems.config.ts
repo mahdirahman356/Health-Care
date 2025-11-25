@@ -42,7 +42,7 @@ export const doctorNavItems: NavSection[] = [
         items: [
             {
                 title: "Appointments",
-                href: "/doctor/dashboard/appoinments",
+                href: "/doctor/dashboard/appointments",
                 icon: "Calendar", 
                 badge: "3",
                 roles: ["DOCTOR"],
