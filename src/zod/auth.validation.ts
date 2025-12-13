@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import z from "zod";
 
-export const registerValidationZodSchema = z.object({
+export const registerPatientValidationZodSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
     address: z.string().optional(),
     email: z.email({ message: "Valid email is required" }),
@@ -31,6 +31,23 @@ export const loginValidationZodSchema = z.object({
 
 export const resetPasswordSchema = z
     .object({
+        newPassword: z.string().min(6, "Password must be at least 6 characters"),
+        confirmPassword: z
+            .string()
+            .min(6, "Password must be at least 6 characters"),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
+    });
+
+export const forgotPasswordSchema = z.object({
+    email: z.email("Please enter a valid email address"),
+});
+
+export const changePasswordSchema = z
+    .object({
+        oldPassword: z.string().min(6, "Password must be at least 6 characters"),
         newPassword: z.string().min(6, "Password must be at least 6 characters"),
         confirmPassword: z
             .string()
