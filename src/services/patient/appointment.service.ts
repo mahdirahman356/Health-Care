@@ -68,7 +68,7 @@ export async function createAppointmentWithPayLater(data: IAppointmentFormData) 
 export async function getMyAppointments(queryString?: string) {
     try {
         const response = await serverFetch.get(
-            `/appointment/my-appointment${queryString ? `?${queryString}` : "?sortBy=createdAt&sortOrder=desc"}`, {
+            `/appointment/my-appointments${queryString ? `?${queryString}` : "?sortBy=createdAt&sortOrder=desc"}`, {
             next: {
                 tags: ["my-appointments"],
                 revalidate: 120,
@@ -92,7 +92,7 @@ export async function getMyAppointments(queryString?: string) {
 
 export async function getAppointmentById(appointmentId: string) {
     try {
-        const response = await serverFetch.get('/appointment/my-appointment', {
+        const response = await serverFetch.get('/appointment/my-appointments', {
             next: {
                 tags: ["my-appointments", `appointment-${appointmentId}`],
                 revalidate: 180,
@@ -102,7 +102,7 @@ export async function getAppointmentById(appointmentId: string) {
 
         if (result.success && result.data) {
             // Find the appointment by ID from the list
-            const appointment = result.data.find((apt: any) => apt.id === appointmentId);
+            const appointment = result?.data?.data.find((apt: any) => apt.id === appointmentId);
 
             if (appointment) {
                 return {

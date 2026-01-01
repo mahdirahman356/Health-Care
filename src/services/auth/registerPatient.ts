@@ -2,7 +2,7 @@
 "use server"
 import { serverFetch } from "@/lib/server-fetch";
 import { loginUser } from "./loginUser";
-import { registerValidationZodSchema } from "@/zod/auth.validation";
+import { registerPatientValidationZodSchema } from "@/zod/auth.validation";
 import { zodValidator } from "@/lib/zodValidator";
 
 
@@ -20,11 +20,11 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
         }
 
 
-        if (zodValidator(payload, registerValidationZodSchema).success === false) {
-            return zodValidator(payload, registerValidationZodSchema);
+        if (zodValidator(payload, registerPatientValidationZodSchema).success === false) {
+            return zodValidator(payload, registerPatientValidationZodSchema);
         }
 
-        const validatedPayload: any = zodValidator(payload, registerValidationZodSchema).data;
+        const validatedPayload: any = zodValidator(payload, registerPatientValidationZodSchema).data;
 
         const registerData = {
             password: validatedPayload.password,
