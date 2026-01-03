@@ -53,7 +53,7 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
             await loginUser(_currentState, formData)
         }
 
-        return res;
+        return result;
 
     } catch (error: any) {
         console.log(error);
