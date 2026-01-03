@@ -1,83 +1,121 @@
-"use client"
-
+"use client";
 import InputFieldError from "@/components/shared/InputFieldError";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { createSpeciality } from "@/services/admin/specialitiesManagement";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-
-interface SpecialitiesFormDialogProps {
-    open: boolean,
-    onClose: () => void,
-    onSuccess: () => void
+interface ISpecialitiesFormDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
 const SpecialitiesFormDialog = ({
-    open,
-    onClose,
-    onSuccess }: SpecialitiesFormDialogProps) => {
+  open,
+  onClose,
+  onSuccess,
+}: ISpecialitiesFormDialogProps) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [state, formAction, pending] = useActionState(createSpeciality, null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const prevStateRef = useRef(state);
 
-    const [state, formAction, pending] = useActionState(createSpeciality, null)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setSelectedFile(file || null);
+  };
 
-    useEffect(() => {
-        if (state && state?.success) {
-            toast.success(state.message)
-            onSuccess()
-            onClose()
-        } else if (state && !state.success) {
-            toast.error(state.message)
-            console.log("error:", state.errors)
-        }
-    }, [onClose, onSuccess, state])
+  useEffect(() => {
+    // Only process if state actually changed
+    if (state === prevStateRef.current) return;
+    prevStateRef.current = state;
 
-    return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Add New Specialty</DialogTitle>
-                </DialogHeader>
+    if (state?.success) {
+      toast.success(state.message);
+      onSuccess();
+      onClose();
+    } else if (state && !state.success && state.message) {
+      toast.error(state.message);
 
-                <form action={formAction} className="space-y-4">
-                    <Field>
-                        <FieldLabel htmlFor="title">Title</FieldLabel>
-                        <Input id="title" name="title" placeholder="Cardiology" required />
-                        <InputFieldError field="title" state={state} />
-                    </Field>
+      if (selectedFile && fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(selectedFile);
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
+  }, [state, onSuccess, onClose, selectedFile]);
 
-                    <Field>
-                        <FieldLabel htmlFor="file">Upload Icon</FieldLabel>
+  const handleClose = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    if (selectedFile) {
+      setSelectedFile(null);
+    }
+    formRef.current?.reset();
+    onClose();
+  };
 
-                        <Input id="file" name="file" type="file" accept="image/*" />
-                        <InputFieldError field="file" state={state} />
-                    </Field>
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Specialty</DialogTitle>
+        </DialogHeader>
 
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                            disabled={pending}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={pending}>
-                            {pending ? "Saving..." : "Save Specialty"}
-                        </Button>
-                    </div>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
+        <form ref={formRef} action={formAction} className="space-y-4">
+          <Field>
+            <FieldLabel htmlFor="title">Title</FieldLabel>
+            <Input
+              id="title"
+              name="title"
+              placeholder="Cardiology"
+              defaultValue={state?.formData?.title || ""}
+            />
+            <InputFieldError field="title" state={state} />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="file">Upload Icon</FieldLabel>
+
+            <Input
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              id="file"
+              name="file"
+              type="file"
+              accept="image/*"
+            />
+            <InputFieldError field="icon" state={state} />
+          </Field>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={pending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving..." : "Save Specialty"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export default SpecialitiesFormDialog;

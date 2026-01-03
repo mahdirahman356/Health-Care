@@ -1,15 +1,11 @@
 import DoctorFilters from "@/components/modules/Admin/DoctorsManagement/DoctorFilters";
 import DoctorsManagementHeader from "@/components/modules/Admin/DoctorsManagement/DoctorsManagementHeader";
 import DoctorsTable from "@/components/modules/Admin/DoctorsManagement/DoctorsTable";
-import RefreshButton from "@/components/shared/RefreshButton";
-import SearchFilter from "@/components/shared/SearchFilter";
-import SelectFilter from "@/components/shared/SelectFilter";
 import TablePagination from "@/components/shared/TablePagination";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { queryStringFormatter } from "@/lib/formatters";
 import { getDoctors } from "@/services/admin/doctorManagement";
 import { getSpecialities } from "@/services/admin/specialitiesManagement";
-import { ISpecialty } from "@/types/specialities.interface";
 import { Suspense } from "react";
 
 const AdminDoctorManagementPage = async ({
