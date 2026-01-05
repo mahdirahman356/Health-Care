@@ -5,6 +5,7 @@ import Link from "next/link";
 import AISearchDialog from "./AISSearchDialog";
 import NavbarAuthButtons from "./NavbarAuthButtons";
 import MobileMenu from "./MobileMenu";
+import { CircleFadingPlus } from "lucide-react";
 
 const PublicNavbar = async () => {
   const navItems = [
@@ -24,8 +25,14 @@ const PublicNavbar = async () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur  dark:bg-background/95">
       <div className="container max-w-7xl mx-auto px-6 flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-primary">PH Doc</span>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 bg-linear-to-br from-primary to-cyan-500 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-200">
+            <CircleFadingPlus className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-xl font-extrabold tracking-tight text-slate-800">
+            Health<span className="text-primary">Care</span>
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">

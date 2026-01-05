@@ -6,6 +6,7 @@ import {
   IAppointment,
 } from "@/types/appointments.interface";
 import { format } from "date-fns";
+import AppointmentCountdown from "../../Patient/PatientAppointment/AppointmentCountdown";
 
 const statusConfig: Record<
   AppointmentStatus,
@@ -50,7 +51,7 @@ export const DoctorAppointmentsColumns: Column<IAppointment>[] = [
     accessor: (appointment) => {
       if (!appointment.schedule?.startDateTime) return "N/A";
       return (
-        <div className="text-sm">
+        <div className="text-sm space-y-1">
           <p className="font-medium">
             {format(
               new Date(appointment.schedule.startDateTime),
@@ -61,6 +62,15 @@ export const DoctorAppointmentsColumns: Column<IAppointment>[] = [
             {format(new Date(appointment.schedule.startDateTime), "h:mm a")} -{" "}
             {format(new Date(appointment.schedule.endDateTime), "h:mm a")}
           </p>
+          {appointment.status === AppointmentStatus.SCHEDULED &&
+            appointment.schedule.startDateTime && (
+              <div className="pt-1">
+                <AppointmentCountdown
+                  appointmentDateTime={appointment.schedule.startDateTime}
+                  className="text-xs"
+                />
+              </div>
+            )}
         </div>
       );
     },

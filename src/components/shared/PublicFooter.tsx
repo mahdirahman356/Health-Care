@@ -1,3 +1,4 @@
+import { CircleFadingPlus } from 'lucide-react';
 import Link from 'next/link';
 
 function PublicFooter() {
@@ -6,7 +7,15 @@ function PublicFooter() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold mb-2">Health Care</h3>
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3 group mb-3">
+              <div className="w-10 h-10 hidden bg-linear-to-br from-primary to-cyan-500 rounded-xl md:flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-200">
+                <CircleFadingPlus className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-xl font-extrabold tracking-tight text-slate-800">
+                Health<span className="text-primary">Care</span>
+              </span>
+            </Link>
             <p className="text-sm text-muted-foreground">Your health is our priority. We are here to provide the best medical services.</p>
           </div>
           <div>

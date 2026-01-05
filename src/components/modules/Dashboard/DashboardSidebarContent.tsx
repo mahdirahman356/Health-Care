@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getIconComponent } from "@/lib/icon-mapper";
+import { CircleFadingPlus } from "lucide-react";
 
 interface DashboardSidebarContentProps {
     userInfo: UserInfo;
@@ -23,12 +24,15 @@ const DashboardSidebarContent = ({
     const pathname = usePathname();
     return (
         <div className="hidden md:flex h-full w-64 flex-col border-r bg-card">
-            {/* Logo/Brand */}
-            <div className="flex h-16 items-center border-b px-6">
-                <Link href={dashboardHome} className="flex items-center space-x-2">
-                    <span className="text-xl font-bold text-primary">PH Healthcare</span>
-                </Link>
-            </div>
+            {/* Logo */}
+            <Link href={dashboardHome} className="flex items-center gap-3 group border-b px-6 py-3">
+                <div className="w-10 h-10 bg-linear-to-br from-primary to-cyan-500 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-200">
+                    <CircleFadingPlus className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xl font-extrabold tracking-tight text-slate-800">
+                    Health<span className="text-primary">Care</span>
+                </span>
+            </Link>
 
             {/* Navigation */}
             <ScrollArea className="flex-1 px-3 py-4">

@@ -5,7 +5,7 @@ import { IPrescription } from "@/types/prescription.interface";
 
 export default async function DoctorPrescriptionsPage() {
   const response = await getMyAppointments();
-  const appointments: IAppointment[] = response?.data || [];
+  const appointments: IAppointment[] = response?.data?.data || [];
 
   const prescriptions: IPrescription[] = appointments
     .filter((appointment) => appointment.prescription) 
